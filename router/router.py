@@ -16,21 +16,24 @@ def parse_api(method_name):
         return "Error: method name %s is not valid!" %method_name
 
     if request.method == 'POST':
-        student_name = request.args.get('student_name', '')
-        student_id = request.args.get('student_id', '')
-        '''
-        the data of request
-        '''
-        form_data = {"student_name": student_name,
-                     "student_id": student_id}
-
-        param = json.dumps(form_data)
+        query = generate_query(request.query_string)
+        param = json.dumps(query)
+        print param
         # url_for('dispaly_redirect_result', data = param)
         url = "http://127.0.0.1:5000" + build_url_based_on_api(method_name, param)
         print url
         return redirect(url, code=307)
     else:
         return "Error: request method is not POST!"
+
+
+def generate_query(query_string):
+    query = query_string.split("&")
+    result = dict()
+    for pair in query:
+        pair =  pair.split("=")
+        result[pair[0]] = pair[1]
+    return result
 
 
 '''
