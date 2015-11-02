@@ -34,7 +34,7 @@ def search_student(db_conn, student_name):
 def add_student(db_conn, student_info):
     cur = db_conn.cursor()
     cur.execute('INSERT INTO STUDENT(NAME, DOB, MAJOR) VALUES(?, ?, ?)',
-                student_info['student_name'], student_info['DOB'], student_info['major'])
+                (student_info['student_name'], student_info['DOB'], student_info['major']))
     cur.commit()
     return cur.lastrowid
 
