@@ -33,7 +33,6 @@ public class CourseService extends HttpServlet {
 	      response.setContentType("text/html");
 
 	      // Actual logic goes here.
-	      System.out.println("hello world");
 	      PrintWriter out = response.getWriter();
 	      out.println("<h1>" + "Your mama" + "</h1>");
 	}
@@ -43,11 +42,20 @@ public class CourseService extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		System.out.println(request.getRequestURL().toString());
-		System.out.println(request.getRequestURI().toString());
-		String value = request.getParameter("key1");
+		String requestUri = request.getRequestURI().toString();
 		PrintWriter out = response.getWriter();
-		out.println(value);
+		String command = ServiceUtil.parseUri(requestUri);
+		if (command.equals("ADD")) {
+			String res = addCourse(request);
+			out.println(res);
+		}
+		
+	}
+	
+	public String addCourse(HttpServletRequest request) {
+		String id = request.getParameter("course_id");
+		String name = request.getParameter("course_name");
+		return null;
 	}
 
 }
