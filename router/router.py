@@ -8,9 +8,9 @@ app.config["DEBUG"] = True
 def hello():
     return "Hello, world!"
 
-@app.route("/api/<method_name>/", methods = ["GET", "POST"])
+@app.route("/api/<method_name>/", methods=["GET", "POST"])
 def parse_api(method_name):
-    method_list = ["AddStudent", "DeleteStudent", "GetStudentInfo", "UpdateStudentInfo"]
+    method_list = ["add", "search", "update", "delete"]
 
     if method_name not in method_list:
         return "Error: method name %s is not valid!" %method_name
@@ -25,14 +25,30 @@ def parse_api(method_name):
                      "student_id": student_id}
 
         param = json.dumps(form_data)
-        url = "http://127.0.0.1:5000" + url_for('dispaly_redirect_result', data = param)
+        # url_for('dispaly_redirect_result', data = param)
+        url = "http://127.0.0.1:5000" + build_url_based_on_api(method_name, param)
         print url
         return redirect(url, code=307)
     else:
         return "Error: request method is not POST!"
 
+
+'''
+Generate url based on the api name and params
+
+'''
+
+
+def build_url_based_on_api(method_name, param):
+    api_list = ["add", "search", "update", "delete"]
+    data = url_for('display_redirect_result', data=param).split("?")[-1]
+
+    url = "/student/%s/?%s" % (method_name, data)
+    return url
+
+
 @app.route('/redirect', methods=["GET", "POST"])
-def dispaly_redirect_result():
+def display_redirect_result():
     if request.method == 'POST':
         json_data = request.args.get('data', '')
         json_data = json.loads(str(json_data))
@@ -46,9 +62,9 @@ def dispaly_redirect_result():
             student_id = 0
         print "Student name :" + student_name + "Stundet ID: %d" %student_id
 
-        # shard based on first letter of student name
+        # shard based on first letter of student name, 'a' is 97
         index = (ord(student_name[0]) - 97) / 9
-        return "Student: %s (ID: %d) will be direct to student service # %d/3" %(student_name, student_id, index)
+        return "Student: %s (ID: %d) will be direct to student service # %d/3" % (student_name, student_id, index)
     else:
         return "Error: request method is not POST!"
 
