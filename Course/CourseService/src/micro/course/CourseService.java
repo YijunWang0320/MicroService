@@ -43,6 +43,11 @@ public class CourseService extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		System.out.println(request.getRequestURL().toString());
+		System.out.println(request.getRequestURI().toString());
+		String value = request.getParameter("key1");
+		PrintWriter out = response.getWriter();
+		out.println(value);
 	}
 
 }
