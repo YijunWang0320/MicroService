@@ -13,12 +13,12 @@ public class DatabaseHelper {
 			c.setAutoCommit(false);
 		} catch (Exception e) {
 			System.err.println(e.getClass().getName() + ": " + e.getMessage());
-			System.exit(0);
+			return;
 		}
 		System.out.println("Successful");
 	}
 
-	public void addCourse(Course course) {
+	public int addCourse(Course course) {
 		Statement stmt = null;
 		try {
 			stmt = c.createStatement();
@@ -29,8 +29,10 @@ public class DatabaseHelper {
 			stmt.executeUpdate(insertSql);
 			stmt.close();
 			c.commit();
+			return 0;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return -1;
 		}
 	}
 
@@ -51,7 +53,8 @@ public class DatabaseHelper {
 			stmt.close();
 			c.commit();
 		} catch (SQLException e) {
-			
+			e.printStackTrace();
+			return null;
 		}
 		return course;
 	}

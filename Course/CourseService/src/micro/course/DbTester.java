@@ -7,7 +7,7 @@ public class DbTester {
 
 		Course c = tester.getCourse(1);
 		System.out.println(c.getCourseId() + "   " + c.getCourseName());
-		c.setCourseName("newnewnewn");
+		c.setCourseName("somecourse");
 		tester.updateCourse(c);
 		c = tester.getCourse(1);
 		System.out.println(c.getCourseId() + "   " + c.getCourseName());

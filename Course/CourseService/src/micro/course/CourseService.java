@@ -15,13 +15,15 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/CourseService")
 public class CourseService extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
+    private DatabaseHelper dbhelper;
     /**
      * @see HttpServlet#HttpServlet()
      */
     public CourseService() {
         super();
         // TODO Auto-generated constructor stub
+        dbhelper = new DatabaseHelper();
+        dbhelper.connect();
     }
 
 	/**
@@ -46,16 +48,40 @@ public class CourseService extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		String command = ServiceUtil.parseUri(requestUri);
 		if (command.equals("ADD")) {
-			String res = addCourse(request);
-			out.println(res);
+			int res = addCourse(request);
+			if (res == 0) {
+				out.println("ADD successful.");
+			} else {
+				out.println("failed to add a new entry.");
+			}
+			
+		} else if (command.equals("SEARCH")) {
+			Course course = searchCourse(request);
+			if (course != null) {
+				out.println("Course id: "+course.getCourseId());
+				out.println("Course name: "+course.getCourseName());
+			} else {
+				out.println("Course does not exist!");
+			}
 		}
-		
+		out.close();
 	}
 	
-	public String addCourse(HttpServletRequest request) {
-		String id = request.getParameter("course_id");
+	public int addCourse(HttpServletRequest request) {
+		String id_str = request.getParameter("course_id");
+		int id = Integer.parseInt(id_str);
 		String name = request.getParameter("course_name");
-		return null;
+		Course course = new Course();
+		course.setCourseId(id);
+		course.setCourseName(name);
+		return dbhelper.addCourse(course);
 	}
+	
+	public Course searchCourse(HttpServletRequest request) {
+		String id_str = request.getParameter("course_id");
+		int id = Integer.parseInt(id_str);
+		return dbhelper.getCourse(id);
+	}
+	
 
 }
