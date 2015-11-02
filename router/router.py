@@ -36,6 +36,7 @@ return: url of shard host
 
 '''
 def get_shard_url(student_name):
+    # shard based on first letter of student name, 'a' is 97
     index = (ord(student_name[0]) - 97) / 9
     print "Student: %s will be direct to student service # %d/3" % (student_name, index)
     return "http://127.0.0.1:5000"
@@ -73,8 +74,8 @@ def build_url_based_on_api(method_name, param):
 @app.route('/redirect', methods=["GET", "POST"])
 def display_redirect_result():
     if request.method == 'POST':
-        json_data = request.args.get('data', '')
-        json_data = json.loads(str(json_data))
+        json_data = str(request.args.get('data', ''))
+        json_data = json.loads(json_data)
 
         student_name = json_data["student_name"]
 
