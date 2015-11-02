@@ -25,7 +25,9 @@ def parse_api(method_name):
                      "student_id": student_id}
 
         param = json.dumps(form_data)
-        return redirect(url_for('http://127.0.0.1:5000/redirect', data=param), code=307)
+        url = "http://127.0.0.1:5000" + url_for('dispaly_redirect_result', data = param)
+        print url
+        return redirect(url, code=307)
     else:
         return "Error: request method is not POST!"
 
