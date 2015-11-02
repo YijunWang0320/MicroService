@@ -35,7 +35,7 @@ public class CourseService extends HttpServlet {
 	      // Actual logic goes here.
 	      System.out.println("hello world");
 	      PrintWriter out = response.getWriter();
-	      out.println("<h1>" + "HelloWorld" + "</h1>");
+	      out.println("<h1>" + "Your mama" + "</h1>");
 	}
 
 	/**
