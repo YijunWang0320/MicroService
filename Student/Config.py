@@ -6,7 +6,7 @@ import os.path
 class Config(object):
     def __init__(self, filename):
         self._config = dict()
-        if not os.path.exists(filename):
+        if os.path.exists(filename):
             fp = open(filename, 'r')
             for line in fp:
                 key, value = line.split('=')
@@ -17,4 +17,4 @@ class Config(object):
         self._config[key] = value
 
     def get(self, key):
-        return self._config[key]
+        return self._config[key] if key in self._config.keys() else None

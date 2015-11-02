@@ -10,7 +10,7 @@ def connect_db(database_name):
 
 def setup_database(database_name):
     CREATE_STUDENT = 'CREATE TABLE STUDENT ( ' \
-                     'ID INTEGER AUTOINCREMENT, ' \
+                     'ID INTEGER AUTO INCREMENT, ' \
                      'NAME TEXT NOT NULL, ' \
                      'DOB TEXT NOT NULL, ' \
                      'MAJOR TEXT NOT NULL, ' \
@@ -34,7 +34,7 @@ def search_student(db_conn, student_name):
 def add_student(db_conn, student_info):
     cur = db_conn.cursor()
     cur.execute('INSERT INTO STUDENT(NAME, DOB, MAJOR) VALUES(?, ?, ?)',
-                student_info['name'], student_info['DOB'], student_info['major'])
+                student_info['student_name'], student_info['DOB'], student_info['major'])
     cur.commit()
     return cur.lastrowid
 
@@ -56,4 +56,5 @@ def update_student(db_conn, student_info):
 def delete_student(db_conn, student_info):
     # test
     cur = db_conn.cursor()
+    delete_sql = 'delete from STUDENT where ID = ' + student_info['student_id']
     return 'yes'
