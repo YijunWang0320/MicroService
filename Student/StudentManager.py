@@ -1,5 +1,7 @@
 import DatabaseUtil
 import json
+
+from ast import literal_eval
 from Config import Config
 from flask import Flask, request, g, redirect, url_for, \
     abort, render_template, session
@@ -29,11 +31,12 @@ def hello():
 
 @app.route("/student/search/", methods=["POST"])
 def search():
-    student_info = request.data
+    student_info = request.args.get('data', '')
     info_dict = json.loads(str(student_info))
     assert type(info_dict) is dict
-    response = DatabaseUtil.search_student(g.db, info_dict['student_name'])
-    return response
+    response = literal_eval(DatabaseUtil.search_student(g.db, info_dict))[0]
+    return render_template('template.html', student_id=response[0], student_name=response[1],
+                           DOB=response[2], major=response[3], operation='search')
 
 
 @app.route("/student/add/", methods=['POST'])
@@ -47,7 +50,7 @@ def add():
 
 @app.route("/student/update/", methods=['POST'])
 def update():
-    student_info = request.data
+    student_info = request.args.get('data', '')
     info_dict = json.loads(str(student_info))
     assert type(info_dict) is dict
     response = DatabaseUtil.update_student(g.db, info_dict)
@@ -56,10 +59,18 @@ def update():
 
 @app.route("/student/delete/", methods=['POST'])
 def delete():
-    student_info = request.data
+    student_info = request.args.get('data', '')
     info_dict = json.loads(str(student_info))
     assert type(info_dict) is dict
     response = DatabaseUtil.delete_student(g.db, info_dict)
+    return response
+
+@app.route("/student/check_exist/", methods=['post'])
+def check_exist():
+    student_info = request.args.get('data', '')
+    info_dict = json.loads(student_info)
+    assert type(info_dict) is dict
+    response = DatabaseUtil.check_exist(g.db, info_dict)
     return response
 
 
