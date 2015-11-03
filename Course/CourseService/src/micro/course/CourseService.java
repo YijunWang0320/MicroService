@@ -2,6 +2,7 @@ package micro.course;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -83,14 +84,14 @@ public class CourseService extends HttpServlet {
 			}
 		} else if (command.equals("ENROLL")) {
 			int res = enrollCourse(request);
-			if (res != -1) {
+			if (res >=0) {
 				out.println("ENROLL successful");
 			} else {
 				out.println("Failed to ENROLL.");
 			}
 		} else if (command.equals("DROP")) {
 			int res = dropCourse(request);
-			if (res != -1) {
+			if (res >= 0) {
 				out.println("DROP successful");
 			} else {
 				out.println("Failed to DROP.");
@@ -154,6 +155,15 @@ public class CourseService extends HttpServlet {
 			return -1;
 		}
 		//TODO: check student exist
+		try {
+			if (!ServiceUtil.studentChecker(sid, sname)) {
+				return -2;
+			}
+		} catch (URISyntaxException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return -3;
+		}
 		Enrollment e = new Enrollment();
 		e.setCourse_id(cid);
 		e.setStudent_id(sid);
@@ -171,6 +181,15 @@ public class CourseService extends HttpServlet {
 			return -1;
 		}
 		//TODO: check student exist
+		try {
+			if (!ServiceUtil.studentChecker(sid, sname)) {
+				return -2;
+			}
+		} catch (URISyntaxException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return -3;
+		}
 		Enrollment e = new Enrollment();
 		e.setCourse_id(cid);
 		e.setStudent_id(sid);
