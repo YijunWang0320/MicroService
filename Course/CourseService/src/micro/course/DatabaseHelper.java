@@ -2,32 +2,31 @@ package micro.course;
 
 import java.sql.*;
 
-import javax.servlet.ServletContext;
-
 public class DatabaseHelper {
 
 	Connection c = null;
-	ServletContext servletContext;
-	/**
-	public DatabaseHelper(ServletContext context) {
-		servletContext = context;
-	}**/
-	
-	public void connect() {
+
+	public void connect(){
 		try {
-			Class.forName("org.sqlite.JDBC");
-			//System.out.println("Here");
-			//String path = servletContext.getRealPath("course_service.db");
-			//System.out.println(path);
-			//c = DriverManager.getConnection("jdbc:sqlite:"+path);
-			c = DriverManager.getConnection("jdbc:sqlite://course_service.db");
-			c.setAutoCommit(false);
-			System.out.println("Successful");
-		} catch (Exception e) {
-			System.err.println(e.getClass().getName() + ": " + e.getMessage());
-			return;
+	    	try {
+				Class.forName("com.mysql.jdbc.Driver").newInstance();
+			} catch (InstantiationException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			} catch (IllegalAccessException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			} catch (ClassNotFoundException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			}
+			c = DriverManager.getConnection("jdbc:mysql://129.236.229.171:3306/Course?" +
+			        "user=root&password=");
+			System.out.println("Connect!");
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
-		
 	}
 
 	public int addCourse(Course course) {
@@ -40,7 +39,6 @@ public class DatabaseHelper {
 							   String.valueOf(courseId) + ",\"" + courseName + "\");";
 			stmt.executeUpdate(insertSql);
 			stmt.close();
-			c.commit();
 			return 0;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -63,7 +61,6 @@ public class DatabaseHelper {
 				course.setCourseName(name);
 			}
 			stmt.close();
-			c.commit();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
@@ -81,7 +78,6 @@ public class DatabaseHelper {
 		    			 "\"where course_id = " + String.valueOf(newId) + ";";
 		    int res = stmt.executeUpdate(sql);
 		    stmt.close();
-		    c.commit();		
 		    return res;
 		} catch (SQLException e) {
 			return -1;
@@ -95,7 +91,6 @@ public class DatabaseHelper {
 			String deleteSql = "DELETE from Course WHERE course_id=" + String.valueOf(courseId) +";";
 			int res = stmt.executeUpdate(deleteSql);
 			stmt.close();
-			c.commit();
 			return res;
 		} catch (SQLException e) {
 			return -1;
