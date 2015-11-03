@@ -2,20 +2,32 @@ package micro.course;
 
 import java.sql.*;
 
+import javax.servlet.ServletContext;
+
 public class DatabaseHelper {
 
 	Connection c = null;
-
+	ServletContext servletContext;
+	/**
+	public DatabaseHelper(ServletContext context) {
+		servletContext = context;
+	}**/
+	
 	public void connect() {
 		try {
 			Class.forName("org.sqlite.JDBC");
-			c = DriverManager.getConnection("jdbc:sqlite:course_service.db");
+			//System.out.println("Here");
+			//String path = servletContext.getRealPath("course_service.db");
+			//System.out.println(path);
+			//c = DriverManager.getConnection("jdbc:sqlite:"+path);
+			c = DriverManager.getConnection("jdbc:sqlite://course_service.db");
 			c.setAutoCommit(false);
+			System.out.println("Successful");
 		} catch (Exception e) {
 			System.err.println(e.getClass().getName() + ": " + e.getMessage());
 			return;
 		}
-		System.out.println("Successful");
+		
 	}
 
 	public int addCourse(Course course) {
@@ -59,7 +71,7 @@ public class DatabaseHelper {
 		return course;
 	}
 
-	public void updateCourse(Course newCourse) {
+	public int updateCourse(Course newCourse) {
 		Statement stmt = null;
 		try {
 		    stmt = c.createStatement();
@@ -67,24 +79,26 @@ public class DatabaseHelper {
 		    String newName = newCourse.getCourseName();
 		    String sql = "UPDATE Course set course_name = \"" + newName + 
 		    			 "\"where course_id = " + String.valueOf(newId) + ";";
-		    stmt.executeUpdate(sql);
+		    int res = stmt.executeUpdate(sql);
 		    stmt.close();
-		    c.commit();			
+		    c.commit();		
+		    return res;
 		} catch (SQLException e) {
-			
+			return -1;
 		}
 	}
 
-	public void deleteCourse(int courseId) {
+	public int deleteCourse(int courseId) {
 		Statement stmt = null;
 		try {
 			stmt = c.createStatement();
 			String deleteSql = "DELETE from Course WHERE course_id=" + String.valueOf(courseId) +";";
-			stmt.executeUpdate(deleteSql);
+			int res = stmt.executeUpdate(deleteSql);
 			stmt.close();
 			c.commit();
+			return res;
 		} catch (SQLException e) {
-			
+			return -1;
 		}
 	}
 	

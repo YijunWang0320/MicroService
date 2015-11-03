@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/CourseService")
 public class CourseService extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private static final String course_id_key = "course_id";
+	private static final String course_name_key = "course_name_key";
     private DatabaseHelper dbhelper;
     /**
      * @see HttpServlet#HttpServlet()
@@ -44,6 +46,7 @@ public class CourseService extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		
 		String requestUri = request.getRequestURI().toString();
 		PrintWriter out = response.getWriter();
 		String command = ServiceUtil.parseUri(requestUri);
@@ -63,25 +66,43 @@ public class CourseService extends HttpServlet {
 			} else {
 				out.println("Course does not exist!");
 			}
+		} else if (command.equals("DELETE")) {
+			
 		}
 		out.close();
 	}
 	
-	public int addCourse(HttpServletRequest request) {
-		String id_str = request.getParameter("course_id");
+	private int addCourse(HttpServletRequest request) {
+		String id_str = request.getParameter(course_id_key);
 		int id = Integer.parseInt(id_str);
-		String name = request.getParameter("course_name");
+		String name = request.getParameter(course_name_key);
 		Course course = new Course();
 		course.setCourseId(id);
 		course.setCourseName(name);
 		return dbhelper.addCourse(course);
 	}
 	
-	public Course searchCourse(HttpServletRequest request) {
-		String id_str = request.getParameter("course_id");
+	private Course searchCourse(HttpServletRequest request) {
+		String id_str = request.getParameter(course_id_key);
 		int id = Integer.parseInt(id_str);
 		return dbhelper.getCourse(id);
 	}
 	
-
+	private int deleteCourse(HttpServletRequest request) {
+		String id_str = request.getParameter(course_id_key);
+		int id = Integer.parseInt(id_str);
+		int delete_res = dbhelper.deleteCourse(id);
+		return delete_res;
+		//TODO: Add delete related relationship.
+	}
+	
+	private int updateCourse(HttpServletRequest request) {
+		String id_str = request.getParameter(course_id_key);
+		int id = Integer.parseInt(id_str);
+		String name = request.getParameter(course_name_key);
+		Course course = new Course();
+		course.setCourseId(id);
+		course.setCourseName(name);
+		return dbhelper.updateCourse(course);
+	}
 }
