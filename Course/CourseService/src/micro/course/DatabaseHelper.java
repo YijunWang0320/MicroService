@@ -22,7 +22,7 @@ public class DatabaseHelper {
 				// TODO Auto-generated catch block
 				e2.printStackTrace();
 			}
-			c = DriverManager.getConnection("jdbc:mysql://129.236.229.171:3306/Course?" +
+			c = DriverManager.getConnection("jdbc:mysql://129.236.228.254:3306/Course?" +
 			        "user=root&password=");
 			System.out.println("Connect!");
 		} catch (SQLException e1) {
@@ -118,13 +118,13 @@ public class DatabaseHelper {
 		Statement stmt = null;
 		try {
 			stmt = c.createStatement();
-			int student_id = enroll.getStudent_id();
+			String student_id = enroll.getStudent_id();
 			int course_id = enroll.getCourse_id();
 			String student_name = enroll.getStudent_name();
 			String addEnroll = "INSERT INTO Enrollment VALUES (" + 
-					   String.valueOf(course_id) + "," + 
-					   String.valueOf(student_id) + ",\"" + 
-					   student_name + "\");";
+					   String.valueOf(course_id) + 
+					   ", \"" + student_id + "\"" +  
+					   ", \"" + student_name + "\");";
 			int res = stmt.executeUpdate(addEnroll);
 			stmt.close();
 			return res;
@@ -143,7 +143,7 @@ public class DatabaseHelper {
 							String.valueOf(courseId) + ";";
 			ResultSet rs = stmt.executeQuery(findSql);
 			while(rs.next()) {
-				int student_id = rs.getInt("student_id");
+				String student_id = rs.getString("student_id");
 				String name = rs.getString("student_name");
 				Enrollment enroll = new Enrollment();
 				enroll.setCourse_id(courseId);

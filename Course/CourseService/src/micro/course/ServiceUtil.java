@@ -45,19 +45,24 @@ public class ServiceUtil {
 		}
 	}
 	
-	public static boolean studentChecker(int sid, String sname) throws URISyntaxException {
+	public static boolean studentChecker(String sid, String sname) throws URISyntaxException {
 		HttpClient httpclient = HttpClients.createDefault();
-		URI address = new URI("http", null, "129.236.212.69", 5000, null, null, null);
+		URI address = new URI("http", null, "129.236.212.69", 5000,
+				"/api/check_exist/", "student_id="+ sid + "&student_name=" + sname, null);
+//		URI address = new URI("http", null, "129.236.212.69", 5003, 
+//				"/student/check_exist/", "data=%7B%22student_id%22%3A+%22wa4738%22%2C+%22student_name%22%3A+%22wangyijun%22%7D", null);
 		HttpPost httppost = new HttpPost(address);
-		List<NameValuePair> params = new ArrayList<NameValuePair>(2);
-		params.add(new BasicNameValuePair("student_id", ""+sid));
-		params.add(new BasicNameValuePair("student_name", sname));
+		httppost.addHeader("Accept", "*/*");
+//		List<NameValuePair> params = new ArrayList<NameValuePair>(2);
+//		params.add(new BasicNameValuePair("student_id", sid));
+//		params.add(new BasicNameValuePair("student_name", sname));
 		InputStream instream = null;
 		System.out.println("In student checker:");
 		try {
-			httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+			//httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
 			HttpResponse response = httpclient.execute(httppost);
 			HttpEntity entity = response.getEntity();
+			System.out.println("Address: " + address + " Code: " + response.getStatusLine().getStatusCode());
 
 			if (entity != null) {
 			    instream = entity.getContent();
@@ -77,7 +82,6 @@ public class ServiceUtil {
 				try {
 					instream.close();
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			return false;

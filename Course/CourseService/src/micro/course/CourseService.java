@@ -146,8 +146,8 @@ public class CourseService extends HttpServlet {
 	}
 	
 	private int enrollCourse(HttpServletRequest request) {
-		int sid = Integer.parseInt(request.getParameter(student_id_key));
 		int cid = Integer.parseInt(request.getParameter(course_id_key));
+		String sid = request.getParameter(student_id_key);
 		String sname = request.getParameter(student_name_key);
 		Course course = dbhelper.getCourse(cid);
 		if (course == null) {
@@ -172,8 +172,8 @@ public class CourseService extends HttpServlet {
 	}
 	
 	private int dropCourse(HttpServletRequest request) {
-		int sid = Integer.parseInt(request.getParameter(student_id_key));
 		int cid = Integer.parseInt(request.getParameter(course_id_key));
+		String sid = request.getParameter(student_id_key);
 		String sname = request.getParameter(student_name_key);
 		Course course = dbhelper.getCourse(cid);
 		if (course == null) {
