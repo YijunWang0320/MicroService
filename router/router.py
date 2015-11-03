@@ -1,39 +1,69 @@
-from flask import Flask, request, url_for, request, redirect, json
-import requests
-import urllib
+from flask import Flask, url_for, request, redirect, json
+from RouterConfig import RouterConfig
 app = Flask(__name__)
 app.config["DEBUG"] = True
+router_config = RouterConfig("service.cfg")
 
+# get all the allowed api
+method_list = router_config.get_all_api()
 @app.route("/")
 def hello():
-    return "Hello, world!"
+    return "The Router for Student Micro-service"
 
 @app.route("/api/<method_name>/", methods=["GET", "POST"])
 def parse_api(method_name):
-    method_list = ["add", "search", "update", "delete"]
 
     if method_name not in method_list:
-        return "Error: method name %s is not valid!" %method_name
+        return "Error: method name %s is not valid!" % method_name
 
     if request.method == 'POST':
-        query = generate_query(request.query_string)
-        param = json.dumps(query)
-        print param
-        # url_for('dispaly_redirect_result', data = param)
-        url = "http://127.0.0.1:5000" + build_url_based_on_api(method_name, param)
-        print url
+        param_dict = generate_param_dict(request.query_string)
+        student_name = param_dict["student_name"]
+
+        if student_name is None:
+            return "Error: student name is null and the request could not be shard!"
+
+        # shard the request to different service
+        shard_url = get_shard_url(student_name)
+
+        param = json.dumps(param_dict)
+        url = shard_url + build_url_based_on_api(method_name, param)
+
         return redirect(url, code=307)
     else:
         return "Error: request method is not POST!"
 
 
-def generate_query(query_string):
+'''
+shard the request based on student name
+return: url of shard host
+
+'''
+
+
+def get_shard_url(student_name):
+    service_list = router_config.get_all_services()
+    service_amount = len(service_list)
+
+    # shard based on first letter of student name, 'a' is 97
+    index = (ord(student_name[0]) - 97) / (26 / service_amount + 1)
+    print "Student: %s will be direct to student service # %d/%d" % (student_name, index, service_amount)
+    return service_list[index]
+
+
+'''
+Generate dict according the query string of post request
+return: {u'DOB': u'1991', u'student_name': u'wangyijun', u'major': u'CS'}
+'''
+
+
+def generate_param_dict(query_string):
     query = query_string.split("&")
-    result = dict()
+    param_dict = dict()
     for pair in query:
-        pair =  pair.split("=")
-        result[pair[0]] = pair[1]
-    return result
+        pair = pair.split("=")
+        param_dict[pair[0]] = pair[1]
+    return param_dict
 
 
 '''
@@ -43,18 +73,18 @@ Generate url based on the api name and params
 
 
 def build_url_based_on_api(method_name, param):
-    api_list = ["add", "search", "update", "delete"]
-    data = url_for('display_redirect_result', data=param).split("?")[-1]
 
+    data = url_for('display_redirect_result', data=param).split("?")[-1]
     url = "/student/%s/?%s" % (method_name, data)
+
     return url
 
 
 @app.route('/redirect', methods=["GET", "POST"])
 def display_redirect_result():
     if request.method == 'POST':
-        json_data = request.args.get('data', '')
-        json_data = json.loads(str(json_data))
+        json_data = str(request.args.get('data', ''))
+        json_data = json.loads(json_data)
 
         student_name = json_data["student_name"]
 
@@ -63,7 +93,7 @@ def display_redirect_result():
             student_id = int(student_id)
         else:
             student_id = 0
-        print "Student name :" + student_name + "Stundet ID: %d" %student_id
+        print "Student name :" + student_name + "Student ID: %d" % student_id
 
         # shard based on first letter of student name, 'a' is 97
         index = (ord(student_name[0]) - 97) / 9
