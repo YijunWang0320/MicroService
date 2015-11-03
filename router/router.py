@@ -6,7 +6,7 @@ router_config = RouterConfig("service.cfg")
 
 # get all the allowed api
 method_list = router_config.get_all_api()
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def hello():
     return "The Router for Student Micro-service"
 
@@ -25,11 +25,11 @@ def parse_api(method_name):
 
         # shard the request to different service
         shard_url = get_shard_url(student_name)
-
         param = json.dumps(param_dict)
         url = shard_url + build_url_based_on_api(method_name, param)
+        response = redirect(url, code=307)
 
-        return redirect(url, code=307)
+        return response
     else:
         return "Error: request method is not POST!"
 
@@ -102,4 +102,4 @@ def display_redirect_result():
         return "Error: request method is not POST!"
 
 if __name__ == "__main__":
-    app.run(port=5002)
+    app.run(host='0.0.0.0', port=5000)

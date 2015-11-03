@@ -1,8 +1,8 @@
 __author__ = 'wangyijun'
+import datetime
 import sqlite3
 import os.path
-import json
-
+import random
 
 # The code for DB connection
 def connect_db(database_name):
@@ -11,7 +11,7 @@ def connect_db(database_name):
 
 def setup_database(database_name):
     CREATE_STUDENT = 'CREATE TABLE STUDENT ( ' \
-                     'ID INTEGER PRIMARY KEY ASC, ' \
+                     'ID TEXT PRIMARY KEY, ' \
                      'NAME TEXT NOT NULL, ' \
                      'DOB TEXT NOT NULL, ' \
                      'MAJOR TEXT NOT NULL);'
@@ -57,11 +57,33 @@ def search_student(db_conn, student_info):
 
 
 def add_student(db_conn, student_info):
+    def random_id(student_name):
+        letter = student_name[0:2] + str(random.randrange(1000, 9999))
+        return letter
+
+    def valid_date(dob):
+        try:
+            datetime.datetime.strptime(dob, '%Y-%m-%d')
+            return True
+        except:
+            return False
+    if len(student_info['student_name']) < 2:
+        return 'Please input a name that have a first and a last name'
+    if 'dob' not in student_info.keys() or 'major' not in student_info.keys():
+        return 'Please provide the date of birth and major of the student'
+    if not valid_date(student_info['dob']):
+        return 'Please provide the dob in the format of YYYY-MM-DD'
     cur = db_conn.cursor()
-    cur.execute('INSERT INTO STUDENT (NAME, DOB, MAJOR) VALUES(?, ?, ?)',
-                (student_info['student_name'], student_info['dob'], student_info['major']))
+    check_id = 'Not None'
+    student_id = None
+    while check_id is not None:
+        student_id = random_id(student_info['student_name'])
+        cur.execute('SELECT * FROM STUDENT WHERE ID = ?', (student_id, ))
+        check_id = cur.fetchone()
+    cur.execute('INSERT INTO STUDENT (ID, NAME, DOB, MAJOR) VALUES(?, ?, ?, ?)',
+                (student_id, student_info['student_name'], student_info['dob'], student_info['major']))
     db_conn.commit()
-    return 'The id of the added student is ' + str(cur.lastrowid)
+    return 'The id of the added student is ' + str(student_id)
 
 
 def update_student(db_conn, student_info):
