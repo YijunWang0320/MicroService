@@ -85,7 +85,7 @@ public class DatabaseHelper {
 			return -1;
 		}
 	}
-
+	
 	public int deleteCourse(int courseId) {
 		Statement stmt = null;
 		try {
@@ -99,15 +99,17 @@ public class DatabaseHelper {
 		}
 	}
 	
-	public int dropCourse(int course_id) {
+	public int dropCourse(Enrollment e) {
 		Statement stmt = null;
 		try {
 			stmt = c.createStatement();
-			String dropSql = "DELETE from Enrollment WHERE course_id=" + String.valueOf(course_id) +";";
+			String dropSql = "DELETE from Enrollment WHERE course_id="
+							+ String.valueOf(e.getCourse_id()) 
+							+ " AND student_id=" + e.getStudent_id() +";";
 			int res = stmt.executeUpdate(dropSql);
 			stmt.close();
 			return res;
-		} catch (SQLException e) {
+		} catch (SQLException eee) {
 			return -1;
 		}
 	}
@@ -119,7 +121,7 @@ public class DatabaseHelper {
 			int student_id = enroll.getStudent_id();
 			int course_id = enroll.getCourse_id();
 			String student_name = enroll.getStudent_name();
-			String addEnroll = "INSERT INTO Course VALUES (" + 
+			String addEnroll = "INSERT INTO Enrollment VALUES (" + 
 					   String.valueOf(course_id) + "," + 
 					   String.valueOf(student_id) + ",\"" + 
 					   student_name + "\");";
