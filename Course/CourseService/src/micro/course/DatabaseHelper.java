@@ -1,6 +1,8 @@
 package micro.course;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseHelper {
 
@@ -104,14 +106,55 @@ public class DatabaseHelper {
 			String dropSql = "DELETE from Enrollment WHERE course_id=" + String.valueOf(course_id) +";";
 			int res = stmt.executeUpdate(dropSql);
 			stmt.close();
-			c.commit();
 			return res;
 		} catch (SQLException e) {
 			return -1;
 		}
 	}
+
+	public int enrollCourse(Enrollment enroll) {
+		Statement stmt = null;
+		try {
+			stmt = c.createStatement();
+			int student_id = enroll.getStudent_id();
+			int course_id = enroll.getCourse_id();
+			String student_name = enroll.getStudent_name();
+			String addEnroll = "INSERT INTO Course VALUES (" + 
+					   String.valueOf(course_id) + "," + 
+					   String.valueOf(student_id) + ",\"" + 
+					   student_name + "\");";
+			int res = stmt.executeUpdate(addEnroll);
+			stmt.close();
+			return res;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return -1;
+		}
+	}
 	
-	//public List<Enrollment>
+	public List<Enrollment> findEnrolledStudents(int courseId) {
+		List<Enrollment> result = new ArrayList<Enrollment>();
+		Statement stmt = null;
+		try {
+			stmt = c.createStatement();
+			String findSql = "SELECT * FROM Enrollment WHERE course_id = " + 
+							String.valueOf(courseId) + ";";
+			ResultSet rs = stmt.executeQuery(findSql);
+			while(rs.next()) {
+				int student_id = rs.getInt("student_id");
+				String name = rs.getString("student_name");
+				Enrollment enroll = new Enrollment();
+				enroll.setCourse_id(courseId);
+				enroll.setStudent_id(student_id);
+				enroll.setStudent_name(name);
+				result.add(enroll);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return result;
+	}
 	
 	public void close(){
 		try {
