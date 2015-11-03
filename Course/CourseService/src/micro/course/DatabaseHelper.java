@@ -68,7 +68,7 @@ public class DatabaseHelper {
 		return course;
 	}
 
-	public void updateCourse(Course newCourse) {
+	public int updateCourse(Course newCourse) {
 		Statement stmt = null;
 		try {
 		    stmt = c.createStatement();
@@ -76,23 +76,24 @@ public class DatabaseHelper {
 		    String newName = newCourse.getCourseName();
 		    String sql = "UPDATE Course set course_name = \"" + newName + 
 		    			 "\"where course_id = " + String.valueOf(newId) + ";";
-		    stmt.executeUpdate(sql);
+		    int res = stmt.executeUpdate(sql);
 		    stmt.close();
+		    return res;
 		} catch (SQLException e) {
-			
+			return -1;
 		}
 	}
 
-	public void deleteCourse(int courseId) {
+	public int deleteCourse(int courseId) {
 		Statement stmt = null;
 		try {
 			stmt = c.createStatement();
 			String deleteSql = "DELETE from Course WHERE course_id=" + String.valueOf(courseId) +";";
-			stmt.executeUpdate(deleteSql);
+			int res = stmt.executeUpdate(deleteSql);
 			stmt.close();
-			c.commit();
+			return res;
 		} catch (SQLException e) {
-			
+			return -1;
 		}
 	}
 	
