@@ -1,21 +1,34 @@
 package micro.course;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseHelper {
 
 	Connection c = null;
 
-	public void connect() {
+	public void connect(){
 		try {
-			Class.forName("org.sqlite.JDBC");
-			c = DriverManager.getConnection("jdbc:sqlite:course_service.db");
-			c.setAutoCommit(false);
-		} catch (Exception e) {
-			System.err.println(e.getClass().getName() + ": " + e.getMessage());
-			return;
+	    	try {
+				Class.forName("com.mysql.jdbc.Driver").newInstance();
+			} catch (InstantiationException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			} catch (IllegalAccessException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			} catch (ClassNotFoundException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			}
+			c = DriverManager.getConnection("jdbc:mysql://129.236.229.171:3306/Course?" +
+			        "user=root&password=");
+			System.out.println("Connect!");
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
-		System.out.println("Successful");
 	}
 
 	public int addCourse(Course course) {
@@ -28,7 +41,6 @@ public class DatabaseHelper {
 							   String.valueOf(courseId) + ",\"" + courseName + "\");";
 			stmt.executeUpdate(insertSql);
 			stmt.close();
-			c.commit();
 			return 0;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -51,7 +63,6 @@ public class DatabaseHelper {
 				course.setCourseName(name);
 			}
 			stmt.close();
-			c.commit();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
@@ -59,7 +70,7 @@ public class DatabaseHelper {
 		return course;
 	}
 
-	public void updateCourse(Course newCourse) {
+	public int updateCourse(Course newCourse) {
 		Statement stmt = null;
 		try {
 		    stmt = c.createStatement();
@@ -67,25 +78,82 @@ public class DatabaseHelper {
 		    String newName = newCourse.getCourseName();
 		    String sql = "UPDATE Course set course_name = \"" + newName + 
 		    			 "\"where course_id = " + String.valueOf(newId) + ";";
-		    stmt.executeUpdate(sql);
+		    int res = stmt.executeUpdate(sql);
 		    stmt.close();
-		    c.commit();			
+		    return res;
 		} catch (SQLException e) {
-			
+			return -1;
 		}
 	}
 
-	public void deleteCourse(int courseId) {
+	public int deleteCourse(int courseId) {
 		Statement stmt = null;
 		try {
 			stmt = c.createStatement();
 			String deleteSql = "DELETE from Course WHERE course_id=" + String.valueOf(courseId) +";";
-			stmt.executeUpdate(deleteSql);
+			int res = stmt.executeUpdate(deleteSql);
 			stmt.close();
-			c.commit();
+			return res;
 		} catch (SQLException e) {
-			
+			return -1;
 		}
+	}
+	
+	public int dropCourse(int course_id) {
+		Statement stmt = null;
+		try {
+			stmt = c.createStatement();
+			String dropSql = "DELETE from Enrollment WHERE course_id=" + String.valueOf(course_id) +";";
+			int res = stmt.executeUpdate(dropSql);
+			stmt.close();
+			return res;
+		} catch (SQLException e) {
+			return -1;
+		}
+	}
+
+	public int enrollCourse(Enrollment enroll) {
+		Statement stmt = null;
+		try {
+			stmt = c.createStatement();
+			int student_id = enroll.getStudent_id();
+			int course_id = enroll.getCourse_id();
+			String student_name = enroll.getStudent_name();
+			String addEnroll = "INSERT INTO Course VALUES (" + 
+					   String.valueOf(course_id) + "," + 
+					   String.valueOf(student_id) + ",\"" + 
+					   student_name + "\");";
+			int res = stmt.executeUpdate(addEnroll);
+			stmt.close();
+			return res;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return -1;
+		}
+	}
+	
+	public List<Enrollment> findEnrolledStudents(int courseId) {
+		List<Enrollment> result = new ArrayList<Enrollment>();
+		Statement stmt = null;
+		try {
+			stmt = c.createStatement();
+			String findSql = "SELECT * FROM Enrollment WHERE course_id = " + 
+							String.valueOf(courseId) + ";";
+			ResultSet rs = stmt.executeQuery(findSql);
+			while(rs.next()) {
+				int student_id = rs.getInt("student_id");
+				String name = rs.getString("student_name");
+				Enrollment enroll = new Enrollment();
+				enroll.setCourse_id(courseId);
+				enroll.setStudent_id(student_id);
+				enroll.setStudent_name(name);
+				result.add(enroll);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return result;
 	}
 	
 	public void close(){
