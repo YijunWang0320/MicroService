@@ -55,7 +55,7 @@ public class CourseService extends HttpServlet {
 			if (res == 0) {
 				out.println("ADD successful.");
 			} else {
-				out.println("failed to add a new entry.");
+				out.println("Failed to ADD.");
 			}
 			
 		} else if (command.equals("SEARCH")) {
@@ -67,7 +67,19 @@ public class CourseService extends HttpServlet {
 				out.println("Course does not exist!");
 			}
 		} else if (command.equals("DELETE")) {
-			
+			int res = deleteCourse(request);
+			if (res != -1) {
+				out.println("DELETE successful");
+			} else {
+				out.println("Failed to DELETE.");
+			}
+		} else if (command.equals("UPDATE")) {
+			int res = updateCourse(request);
+			if (res != -1) {
+				out.println("UPDATE successful");
+			} else {
+				out.println("Failed to UPDATE.");
+			}
 		}
 		out.close();
 	}
