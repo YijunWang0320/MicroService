@@ -102,6 +102,22 @@ public class DatabaseHelper {
 		}
 	}
 	
+	public int dropCourse(int course_id) {
+		Statement stmt = null;
+		try {
+			stmt = c.createStatement();
+			String dropSql = "DELETE from Enrollment WHERE course_id=" + String.valueOf(course_id) +";";
+			int res = stmt.executeUpdate(dropSql);
+			stmt.close();
+			c.commit();
+			return res;
+		} catch (SQLException e) {
+			return -1;
+		}
+	}
+	
+	//public List<Enrollment>
+	
 	public void close(){
 		try {
 			c.close();
