@@ -82,6 +82,4 @@ public class CourseService extends HttpServlet {
 		int id = Integer.parseInt(id_str);
 		return dbhelper.getCourse(id);
 	}
-	
-
 }
